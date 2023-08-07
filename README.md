@@ -2,6 +2,7 @@
 Deploy a Jenkins server with two agents - dockerized
 
 This setup use three vitual machines:
+
     - Jenkins master - master01
     - agent one - agent01
     - agent two - agent02
