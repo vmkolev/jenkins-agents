@@ -1,0 +1,3 @@
+eval `ssh-agent`
+ssh-add ~/.ssh/ed_github
+ssh -T git@github.com
