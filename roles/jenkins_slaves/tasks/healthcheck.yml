@@ -2,15 +2,15 @@
 - name: Get the list of services
   service_facts:
 
-- name: checking service status
-  shell: docker ps -a | grep Up | awk '{print $4, $5}'
+- name: checking docker status
+  shell: docker ps -a | grep {{ jenkins_agent_container }}-{{ inventory_hostname }}
   register: docker_ps_result
   ignore_errors: yes
   become: false
 
 - name: Define Variable
   set_fact:
-      exists: "{{ docker_ps_result.stdout }}"
+      exists: "{{ docker_ps_result.stdout_lines | default([]) }}"
   failed_when:
     - docker_ps_result.stdout_lines is not defined or docker_ps_result.stdout_lines | length == 0
 

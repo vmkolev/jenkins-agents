@@ -1,3 +1,8 @@
+#- name: Clean up old data 
+#  shell: |
+#    rm -rf {{remote_dir}}/build {{jenkins_data}}
+#  ignore_errors: true
+
 - name: Create directory if not exists
   file:
     path: "{{ item }}"
@@ -10,13 +15,6 @@
       - "{{remote_dir}}/build"    
       - "{{jenkins_data}}"   
     
-#- name: Copy docker-compose.yml
-#  copy:
-#    src: jenkins_master_docker.yml
-#    dest: "{{remote_dir}}/jenkins_master_docker.yml"
-#    owner: "{{ jenkins_user }}"
-#    group: "{{ jenkins_user }}"
-
 # Generate Dockerfile with variables
 - name: Add variables to Dockerfile
   template:

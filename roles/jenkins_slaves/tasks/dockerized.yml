@@ -26,12 +26,21 @@
   command: cat "{{ jenkins_home_dir }}/secret"
   register: result
 
+#- name: Display message with variables
+#  debug: 
+#    msg: |
+#      docker run --name {{ jenkins_agent_container }}-{{ inventory_hostname }}
+#      -- volume: {{ jenkins_agent_directory }}:/home/jenkins
+#      -- init: {{ jenkins_agent_image }} -url {{ jenkins_url }}
+#      -- secret: {{result.stdout}}
+#      -- agent: {{ inventory_hostname }}
+
 - name: Stop specific Docker container
   docker_container:
     name: "{{ jenkins_agent_container }}-{{ inventory_hostname }}"
     state: absent
 
-# Remove all old images and containers
+# Remove old images and containers
 - name: Clean before build
   shell: docker rmi -f "{{ jenkins_agent_image }}"
   ignore_errors: true
@@ -50,3 +59,6 @@
   environment:
     JENKINS_SECRET: "{{result.stdout}}"
     JENKINS_AGENT_NAME: "{{ inventory_hostname }}"
+
+# docker run --rm --detach --name jenkins-agent01 --volume /home/jenkins/jenkins-slave:/home/jenkins
+# --init jenkins/inbound-agent -url http://10.20.30.177:8080 22edd545-5f64-4ca5-9305-59b6301ae581 agent01

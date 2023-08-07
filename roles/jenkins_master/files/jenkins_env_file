@@ -1,1 +1,0 @@
-JENKINS_OPTS="--logfile=/var/jenkins_home/jenkins-master.log"

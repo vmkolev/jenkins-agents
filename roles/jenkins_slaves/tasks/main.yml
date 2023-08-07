@@ -28,7 +28,7 @@
 
 - include_tasks: jenkins_user.yml
 
-- name: Install docker engine on Jenkins master
+- name: Install docker engine on Jenkins agent
   include_tasks: install_docker.yml
 
 - name: Install Jenkins agent

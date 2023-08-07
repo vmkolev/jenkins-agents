@@ -19,8 +19,8 @@ jenkins_master_url: "{{ master01 }}:8080"
 #jenkins_url: "http://{{ jenkins_master_url }}"
 # === variables for agents
 jenkins_agent_dir: /home/jenkins
-jenkins_slave_user: "{{jenkins_user}}"
-jenkins_slave_user_ssh_key: "{{ jenkins_home_dir }}/.ssh/id_rsa_jenkins"
+jenkins_agent_user: "{{jenkins_user}}"
+jenkins_agent_user_ssh_key: "{{ jenkins_home_dir }}/.ssh/id_rsa_jenkins"
 node_names:
   - agent01
   - agent02
@@ -30,7 +30,7 @@ nodePort: 22
 node_mode: NORMAL # or EXCLUSIVE
 # === docker file variables
 plugin_file: "plugins.txt"
-remote_dir: /opt/containers/jenkins
+remote_dir: "{{ jenkins_home_dir }}/jenkins"
 jenkins_data: "{{remote_dir}}/data"
 base_image: jenkins/jenkins:lts
 docker_container: itops_jenkins

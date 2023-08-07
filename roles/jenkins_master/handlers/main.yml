@@ -1,0 +1,7 @@
+---
+# Restart Jenkins service
+- name: Restart Jenkins
+  ansible.builtin.systemd:
+    name: "{{ 'jenkins' if ansible_os_family == 'Debian' else 'jenkins.service' }}"
+    state: restarted
+  listen: "restart jenkins"

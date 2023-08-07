@@ -14,6 +14,4 @@ if(!(jenkins.getAuthorizationStrategy() instanceof FullControlOnceLoggedInAuthor
 // username & password from environment variables
 def user = jenkins.getSecurityRealm().createAccount(env.JENKINS_USER, env.JENKINS_PASS)
 user.save()
-jenkins.getAuthorizationStrategy().add(Jenkins.ADMINISTER, env.JENKINS_USER)
-
 jenkins.save()

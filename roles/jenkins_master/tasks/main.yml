@@ -3,6 +3,8 @@
   debug:
     msg: "Jenkins Master is going to be containirized!"  
 
+- include_tasks: jenkins_user.yml
+
 - name: Install docker engine on Jenkins master
   include_tasks: install_docker.yml
 
@@ -27,7 +29,12 @@
 - name: Check and create if not exist .ssh and keys
   include_tasks: conf_ssh.yml
 
-# Run healthcheck
+#- name: Start docker-compose
+#  docker_compose:
+#  project_src: "{{remote_dir}}/jenkins_master_docker.yml"
+#  state: started
+
+# Run tasks from the 'healthcheck' tag
 - include_tasks: healthcheck.yml
 
 - name: Clear gathered facts

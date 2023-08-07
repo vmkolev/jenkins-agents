@@ -4,11 +4,11 @@ import jenkins.model.Jenkins
 
 def jenkins = Jenkins.getInstance()
 def launcher
-def nodeName = "{{ item }}"
-int nodePort = Integer.parseInt("{{ nodePort }}")
-int node_numExecutors = Integer.parseInt("{{ node_numExecutors }}")
-def nodeRemoteFS = "{{ nodeRemoteFS }}"
-def node_mode = "{{ node_mode }}"
+def nodeName = "agent01"
+int nodePort = Integer.parseInt("22")
+int node_numExecutors = Integer.parseInt("6")
+def nodeRemoteFS = "/home/jenkins/jenkins-agent"
+def node_mode = "NORMAL"
 
 ComputerLauncher nodeLauncher = new hudson.slaves.JNLPLauncher()
 Node node = new DumbSlave(

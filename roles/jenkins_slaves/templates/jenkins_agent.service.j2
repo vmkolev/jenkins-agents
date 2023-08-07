@@ -1,0 +1,11 @@
+[Unit]
+Description=Jenkins Agent
+
+[Service]
+User={{ jenkins_user }}
+WorkingDirectory={{ jenkins_slave_directory }}
+ExecStart=java -jar "{{ jenkins_slave_directory }}/agent.jar" -jnlpUrl "http://{{ jenkins_master_url }}/computer/{{ inventory_hostname }}/jenkins-agent.jnlp"
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

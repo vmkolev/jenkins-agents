@@ -31,12 +31,11 @@ packages_to_install:
     - rsync    
 java_debian: openjdk-11-jdk
 java_rhel: java-11-openjdk
-jenkins_master_url: "http://XX.XX.XX.XX:8080"
+jenkins_master_url: "http://10.20.30.177:8080"
 jenkins_user: jenkins
 jenkins_home_dir: /home/jenkins
-jenkins_master_directory: /var/lib/jenkins
-jenkins_agent_directory: "{{ jenkins_home_dir }}/jenkins-agent"
 #======== agent
+jenkins_agent_directory: "{{ jenkins_home_dir }}/jenkins-agent"
 jenkins_agent_container: jenkins
 jenkins_agent_image: jenkins/inbound-agent
 jenkins_agent_name:

@@ -15,25 +15,3 @@
 #- name: add nodes
 #  community.docker.docker_container_exec:
 #    container: "{{ docker_container }}"
-#    command: groovy /usr/share/jenkins/ref/init.groovy.d/add_agent01.groovy
-
-#docker exec -it my_jenkins_container groovy /usr/share/jenkins/ref/init.groovy.d/your-groovy-script.groovy
-
-#- name: Add nodes to jenkins
-#  shell: |
-#    curl --user '$JENKINS_USER:$JENKINS_PASS' --data-urlencode \
-#    "script=$(< scripts/add_agent01.groovy)" https://{{ inventory_hostname }}:8080/scriptText
-#- name: Copy Groovy script to Jenkins container
-#  copy:
-#    src: "{{role_path }}/scripts/add_{{ item }}.groovy"  # Пътят до вашия Groovy скрипт
-#    dest: /var/jenkins_home/init.groovy.d/  # Пътят до директорията, където Jenkins зарежда скриптовете
-#  delegate_to: localhost
-#  run_once: true
-#  loop: "{{ node_names }}"
-#  notify:
-#    - Restart Jenkins container
-
-#- name: Restart Jenkins container
-#  docker_container:
-#    name: itops_jenkins  # Името на контейнера (променете според вашите нужди)
-#    state: restarted
