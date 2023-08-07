@@ -4,14 +4,18 @@
   ignore_errors: yes
   register: jenkins_user_check
 
+- name: Add group "editor" to remote node
+  group:
+    name: "{{ jenkins_user }}"
+    gid: 1000
+    state: present
+    
 - name: Create Jenkins User
   user:
     name: "{{ jenkins_user }}"
     uid: 1000
-    gid: 1000
+    groups: "{{ jenkins_user }}"
     home: "{{ jenkins_home_dir }}"
-    home_mode: "u+rwx,g+rwx"
-    createhome: yes
+    createhome: true
     shell: "/bin/bash"
   when: jenkins_user_check.rc != 0
-
