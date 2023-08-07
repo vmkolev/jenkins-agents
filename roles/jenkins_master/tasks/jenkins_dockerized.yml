@@ -1,0 +1,32 @@
+# Remove all old images and containers
+- name: Clean before build
+  shell: |
+    docker container stop {{ docker_container }}
+    docker builder prune -f -a
+    docker rm -f $(docker ps -aq)
+    docker rmi -f $(docker images -a -q)
+  ignore_errors: true
+
+# Build a new jenkins image
+- name: Create Jenkins docker Image
+  docker_image:
+    name: "{{ docker_image }}"
+    tag: "{{ image_tag }}"
+    build:
+      nocache: true
+      path: "{{remote_dir}}/build"
+    source: build
+
+# Create jenkins master container
+- name: Start Container
+  docker_container:
+    name: "{{ docker_container }}"
+    image: "{{ docker_image }}:{{ image_tag }}"
+    state: started
+    auto_remove: no
+    volumes:
+      - "{{ jenkins_data }}:/var/jenkins_home"
+    ports:
+      - "8080:8080"
+      - "{{ jenkins_agent_port }}:{{ jenkins_agent_port }}"
+#    env_file: files/jenkins_env_file

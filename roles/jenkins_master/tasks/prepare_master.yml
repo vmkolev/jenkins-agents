@@ -1,0 +1,58 @@
+- name: Create directory if not exists
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ jenkins_user }}"
+    group: "{{ jenkins_user }}"
+  loop:
+      - "{{remote_dir}}"
+      - "{{remote_dir}}/build"    
+      - "{{jenkins_data}}"   
+    
+#- name: Copy docker-compose.yml
+#  copy:
+#    src: jenkins_master_docker.yml
+#    dest: "{{remote_dir}}/jenkins_master_docker.yml"
+#    owner: "{{ jenkins_user }}"
+#    group: "{{ jenkins_user }}"
+
+# Generate Dockerfile with variables
+- name: Add variables to Dockerfile
+  template:
+    src: templates/Dockerfile.j2
+    dest: "{{role_path }}/files/Dockerfile"
+  delegate_to: localhost
+  run_once: true
+
+- name: Copy Dockerfile to Jenkins master
+  copy:
+    src: Dockerfile
+    dest: "{{remote_dir}}/build/Dockerfile"
+    owner: "{{ jenkins_user }}"
+    group: "{{ jenkins_user }}"
+
+- name: Copy plugins file to to Jenkins master
+  copy:
+    src: "{{plugin_file}}"
+    dest: "{{remote_dir}}/build/{{plugin_file}}"
+    owner: "{{ jenkins_user }}"
+    group: "{{ jenkins_user }}"
+
+# Generate files from template for all agents
+- name: Generate add_agentXX.groovy files
+  template:
+    src: templates/agents.j2
+    dest: "{{role_path }}/scripts/add_{{ item }}.groovy"
+  delegate_to: localhost
+  run_once: true
+  loop: "{{ node_names }}"
+
+- name: Copy scripts folder to to Jenkins master
+  copy:
+    src: scripts/
+    dest: "{{remote_dir}}/build/scripts"
+    owner: "{{ jenkins_user }}"
+    group: "{{ jenkins_user }}"
+
+

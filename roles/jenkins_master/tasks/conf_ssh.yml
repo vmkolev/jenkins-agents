@@ -1,0 +1,41 @@
+---
+- name: Check vars
+  debug:
+    msg: "The path jenkins_home_dir is - {{ jenkins_home_dir }}/.ssh/" 
+
+# Check if .ssh directory exists 
+- name: Check if .ssh directory exists in user's home
+  stat:
+    path: "{{ jenkins_home_dir }}/.ssh/"
+  register: ssh_dir
+
+# If the folder is not exist then create it
+- name: Create .ssh directory if it doesn't exist
+  become: true
+  file:
+    path: "{{ jenkins_home_dir }}/.ssh/"
+    state: directory
+    owner: "{{ jenkins_user }}"
+    group: "{{ jenkins_user }}"    
+    mode: '0700'
+  when: not ssh_dir.stat.exists
+
+# Create SSH keypair
+- name: Generate SSH keypair for the {{ jenkins_user }}
+  openssh_keypair:
+    path: "{{ jenkins_slave_user_ssh_key }}"
+    owner: "{{ jenkins_user }}"
+    group: "{{ jenkins_user }}"
+    size: 2048
+    mode: '0600'
+  when: not ssh_dir.stat.exists
+  become: true
+  register: keypair_result
+
+- name: Fetch SSH public key from {{ inventory_hostname }}
+  ansible.builtin.fetch:
+    src: "{{ jenkins_home_dir }}/.ssh/id_rsa_jenkins.pub"
+    dest: "{{ playbook_dir }}/roles/jenkins_master/files/ssh/id_rsa_jenkins.pub"
+    flat: yes
+  delegate_to: "{{ inventory_hostname }}"
+  when: keypair_result.changed

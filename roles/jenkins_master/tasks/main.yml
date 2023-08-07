@@ -1,0 +1,34 @@
+---
+- name: Jenkins Master role is being executed
+  debug:
+    msg: "Jenkins Master is going to be containirized!"  
+
+- name: Install docker engine on Jenkins master
+  include_tasks: install_docker.yml
+
+# Create foldersand copy files to the jenkins master
+- name: Prepare Jenkins master for containers
+  include_tasks: prepare_master.yml
+
+# Create foldersand copy files to the jenkins master
+- name: Create and run Jenkins master in container
+  include_tasks: jenkins_dockerized.yml
+
+- name: Perform action to setup the new Jenkins server
+  debug:
+    msg: "Setup the new Jenkins server"
+
+- name: Configure jenkins
+  include_tasks: jenkins_config.yml
+  vars:
+    jenkins_url: "http://{{ inventory_hostname }}:8080"
+
+# Check for .ssh and ssh keys 
+- name: Check and create if not exist .ssh and keys
+  include_tasks: conf_ssh.yml
+
+# Run healthcheck
+- include_tasks: healthcheck.yml
+
+- name: Clear gathered facts
+  meta: clear_facts

@@ -1,0 +1,23 @@
+import hudson.slaves.*
+
+def instance = Jenkins.getInstance()
+def launcher
+def nodeName = "{{ item }}"
+int nodePort = Integer.parseInt("{{ nodePort }}")
+int node_numExecutors = Integer.parseInt("{{ node_numExecutors }}")
+def nodeRemoteFS = "{{ nodeRemoteFS }}"
+def node_mode = "{{ node_mode }}"
+
+ComputerLauncher nodeLauncher = new hudson.slaves.JNLPLauncher()
+Node node = new DumbSlave(
+		nodeName,
+		nodeRemoteFS,
+		nodeLauncher)
+		
+Jenkins jenkins = Jenkins.getInstance()
+node.setNumExecutors(node_numExecutors)
+node.setLabelString("agent-" + nodeName)
+node.setMode(Node.Mode.valueOf(node_mode))
+jenkins.addNode(node)
+
+println("Agent ${nodeName} has been created successfully.")

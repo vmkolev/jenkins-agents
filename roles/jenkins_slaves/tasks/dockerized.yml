@@ -1,0 +1,52 @@
+---
+- name: Download jenkins-cli.jar
+  get_url:
+    url: "{{ jenkins_url }}/jnlpJars/jenkins-cli.jar"
+    dest: "{{ jenkins_home_dir }}/jenkins-cli.jar"
+    owner: "{{ jenkins_user }}"
+    group: "{{ jenkins_user }}"
+    mode: 0755
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: Get secret from Jenkins master
+  shell: |
+    curl -L -s -u {{jenkins_user}}:{{jenkins_pass}} {{ jenkins_url }}/computer/{{ inventory_hostname }}/jenkins-agent.jnlp | grep -oP '(?<=<argument>).*?(?=</argument>)' | sed -n 1p  > {{ jenkins_home_dir }}/secret
+  ignore_errors: yes
+  delegate_to: "{{ inventory_hostname }}"
+
+# Set permission on secret file
+- name: Set permission on secret file
+  file:
+    path: "{{ jenkins_home_dir }}/secret"
+    mode: 0755
+    owner: "{{ jenkins_user }}"
+    group: "{{ jenkins_user }}"
+
+- name: Read Jenkins agent token from the file
+  command: cat "{{ jenkins_home_dir }}/secret"
+  register: result
+
+- name: Stop specific Docker container
+  docker_container:
+    name: "{{ jenkins_agent_container }}-{{ inventory_hostname }}"
+    state: absent
+
+# Remove all old images and containers
+- name: Clean before build
+  shell: docker rmi -f "{{ jenkins_agent_image }}"
+  ignore_errors: true
+
+# Create jenkins master container
+- name: Start Container
+  docker_container:
+    name: "{{ jenkins_agent_container }}-{{ inventory_hostname }}"
+    image: "{{ jenkins_agent_image }}"
+    state: started
+    detach: yes
+    volumes:
+      - "{{ jenkins_agent_directory }}:/home/jenkins"
+    init: yes
+    command: -url {{ jenkins_url }} {{result.stdout}} {{ inventory_hostname }}
+  environment:
+    JENKINS_SECRET: "{{result.stdout}}"
+    JENKINS_AGENT_NAME: "{{ inventory_hostname }}"

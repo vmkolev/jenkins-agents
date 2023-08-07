@@ -1,0 +1,44 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Update yum cache
+  yum:
+    name: '*'
+    state: latest
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: Install NTP
+  package:
+    name: "{{ 'ntp' if ansible_os_family == 'Debian' else 'ntpdate' }}"
+    state: present
+
+- name: Install necessary packages
+  package:
+    name: "{{ packages_to_install[ansible_os_family] }}"
+    state: present
+  when: ansible_os_family == 'Debian' or ansible_os_family == 'RedHat'
+
+- name: Install Java
+  package:
+    name: "{{ java_debian if ansible_os_family == 'Debian' else java_rhel }}"
+    state: present
+
+- include_tasks: jenkins_user.yml
+
+- name: Install docker engine on Jenkins master
+  include_tasks: install_docker.yml
+
+- name: Install Jenkins agent
+  include_tasks: install_jenkins_agent.yml
+
+- include_tasks: dockerized.yml
+  vars:
+    jenkins_url: "{{ jenkins_master_url }}"
+
+- include_tasks: healthcheck.yml
+
+- name: Clear gathered facts
+  meta: clear_facts

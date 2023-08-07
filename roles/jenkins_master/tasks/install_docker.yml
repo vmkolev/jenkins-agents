@@ -1,0 +1,64 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  when: ansible_os_family == 'Debian'
+
+- name: Update yum cache
+  yum:
+    name: '*'
+    state: latest
+  when: ansible_os_family == 'RedHat'
+
+- name: Install necessary packages
+  package:
+    name: "{{ packages_to_install[ansible_os_family] }}"
+    state: present
+  when: ansible_os_family == 'Debian' or ansible_os_family == 'RedHat'
+
+- name: Add Docker repository GPG key {{ ansible_distribution_release }}
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Add Docker repository for {{ ansible_distribution }} {{ ansible_lsb.codename }}
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_lsb.codename }} stable"
+    state: present
+  when:  ansible_os_family == "Debian"
+
+
+- name: Add Docker repository for {{ ansible_distribution }}
+  yum_repository:
+    name: docker-ce-stable
+    baseurl: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/{{ ansible_distribution_major_version }}/x86_64/stable"
+    description: Docker CE Stable - $basearch
+    gpgcheck: yes
+    gpgkey: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+    enabled: yes
+  when: ansible_os_family == 'RedHat'
+
+- name: Install Docker Engine - docker-ce
+  package:
+    name: docker-ce
+    state: latest
+
+- name: Install Docker Module for Python
+  pip:
+    name: docker
+    
+- name: Start and enable Docker service
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add users to the Docker group
+  user:
+    name: "{{ item }}"
+    groups: docker
+    append: yes
+  loop:
+    - "{{ ansible_user }}"
+    - "{{ jenkins_user }}"

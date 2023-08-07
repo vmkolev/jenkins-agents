@@ -1,0 +1,21 @@
+---
+- name: Get the list of services
+  service_facts:
+
+- name: checking service status
+  shell: docker ps -a | grep {{ docker_container }}
+  register: docker_ps_result
+  ignore_errors: yes
+  become: false
+
+- name: Define Variable
+  set_fact:
+      exists: "{{ docker_ps_result.stdout }}"
+  failed_when:
+    - docker_ps_result.stdout_lines is not defined or docker_ps_result.stdout_lines | length == 0
+
+- debug:
+    msg: "{{ jenkins_agent_container }}-{{ inventory_hostname }} is up for: {{ docker_ps_result.stdout_lines }}"
+
+- name: Clear gathered facts
+  meta: clear_facts

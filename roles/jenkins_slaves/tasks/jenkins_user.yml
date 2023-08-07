@@ -1,0 +1,12 @@
+---
+- name: Check if Jenkins user exists
+  shell: getent passwd {{ jenkins_user }}
+  ignore_errors: yes
+  register: jenkins_user_check
+
+- name: Create Jenkins User
+  user:
+    name: "{{ jenkins_user }}"
+    home: "{{ jenkins_slave_directory }}"
+    createhome: yes
+  when: jenkins_user_check.rc != 0

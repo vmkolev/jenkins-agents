@@ -1,0 +1,19 @@
+---
+- hosts: jenkins_master
+  remote_user: vkolev
+  gather_facts: true
+  become: true
+
+  roles:
+    - role: jenkins_master
+      
+- hosts: jenkins_slaves
+  serial: 1
+  gather_facts: true
+  become: true
+
+  roles:
+    - role: jenkins_slaves
+
+# Before run this playbook:
+# ansible-galaxy collection install community.docker  !!!!!

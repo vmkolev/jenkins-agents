@@ -1,0 +1,40 @@
+---
+- name: Setup prerequisites settings for Slave role
+  debug:
+    msg: "Setup prerequisites settings for Slave role!"  
+
+# Create working folder for slave
+- name: Create Jenkins Agent Directory - {{ jenkins_agent_directory }}
+  file:
+    path: "{{ jenkins_agent_directory }}"
+    state: directory
+    owner: "{{ jenkins_user }}"
+    group: "{{ jenkins_user }}"
+
+# Check if .ssh directory exists in user's home folder
+- name: Check if .ssh directory exists in {{jenkins_user}} home
+  stat:
+    path: "{{ jenkins_home_dir }}/.ssh/"
+  register: ssh_dir
+
+# Create .ssh folder if it doesn't exist
+- name: Create .ssh directory if it doesn't exist
+  file:
+    path: "{{ jenkins_home_dir }}/.ssh/"
+    state: directory
+    mode: '0700'
+    owner: "{{ jenkins_user }}"
+    group: "{{ jenkins_user }}"
+  when: not ssh_dir.stat.exists
+
+# Copy public key from master to slave
+- name: Add SSH public key to authorized_keys on "{{ inventory_hostname }}"
+  ansible.builtin.copy:
+    content: "{{ lookup('file', playbook_dir + '/roles/jenkins_master/files/ssh/id_rsa_jenkins.pub') }}"
+    dest: "{{ jenkins_home_dir }}/.ssh/authorized_keys"
+    mode: "0600"
+    owner: "{{ jenkins_user }}"
+    group: "{{ jenkins_user }}"
+  become: true
+#  delegate_to: "{{ inventory_hostname }}"
+
