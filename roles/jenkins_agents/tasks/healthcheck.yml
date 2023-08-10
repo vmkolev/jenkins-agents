@@ -6,7 +6,6 @@
   shell: docker ps -a | grep {{ jenkins_agent_container }}-{{ inventory_hostname }}
   register: docker_ps_result
   ignore_errors: yes
-  become: false
 
 - name: Define Variable
   set_fact:

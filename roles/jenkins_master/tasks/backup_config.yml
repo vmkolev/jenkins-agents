@@ -1,0 +1,20 @@
+---
+- name: Fetch files & folder from Jenkins controller - {{ inventory_hostname }}
+  become: yes
+  block:
+
+    - ansible.builtin.synchronize:
+        src: "{{ jenkins_data }}/nodes"
+        dest: "{{ playbook_dir }}/roles/jenkins_master/files"
+        mode: pull
+
+    - ansible.builtin.synchronize:
+        src: "{{ jenkins_data }}/jobs"
+        dest: "{{ playbook_dir }}/roles/jenkins_master/files"
+        mode: pull
+
+    - ansible.builtin.fetch:
+        src: "{{ jenkins_data }}/config.xml"
+        dest: "{{ playbook_dir }}/roles/jenkins_master/files/"
+        flat: yes
+

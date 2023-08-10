@@ -1,19 +1,51 @@
+# ============================================================== # 
+#            Use commands below to run this playbook:            #
+# -------------------------------------------------------------- #
+# To list all tags use command:
+# ansible-playbook -i inventory.ini main.yml --list-tags
+#
+# To perform all tasks for Jenkins server
+# ansible-playbook -i inventory.ini main.yml --limit jenkins_master
+#
+# To perform all tasks for Jenkins agent 
+# ansible-playbook -i inventory.ini main.yml --limit jenkins_agents
+#
+# To install Java on Jenkins agents
+# ansible-playbook -i inventory.ini main.yml --tags install_java
+#
+# To install packages on Jenkins master and agents
+# ansible-playbook -i inventory.ini main.yml --tags install_packages
+#
+# To create jenkins user and generate ssh
+# ansible-playbook -i inventory.ini main.yml --tags user_ssh
+#
+# To create new docker images and run containers
+# ansible-playbook -i inventory.ini main.yml --tags dockerized
+#
+# Run healthcheck to check all Jenkins servers
+# ansible-playbook -i inventory.ini main.yml --tags healthcheck
+#
+# To skip some of the tags:
+# ansible-playbook -i inventory.ini main.yml --skip-tags backup
+#
+# Note:
+# Before run this playbook:
+# ansible-galaxy collection install community.docker  !!!!! 
+# Velislav Kolev 2023
+# ============================================================== #
 ---
 - hosts: jenkins_master
-  remote_user: vkolev
+  remote_user: "{{ ansible_user }}"
   gather_facts: true
   become: true
 
   roles:
     - role: jenkins_master
       
-- hosts: jenkins_slaves
+- hosts: jenkins_agents
   serial: 1
   gather_facts: true
   become: true
 
   roles:
-    - role: jenkins_slaves
-
-# Before run this playbook:
-# ansible-galaxy collection install community.docker  !!!!!
+    - role: jenkins_agents

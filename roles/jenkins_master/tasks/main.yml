@@ -3,18 +3,24 @@
   debug:
     msg: "Jenkins Master is going to be containirized!"  
 
-- include_tasks: jenkins_user.yml
+- block:
+    - include_tasks: jenkins_user.yml
+  tags: user_ssh
 
-- name: Install docker engine on Jenkins master
-  include_tasks: install_docker.yml
+- block:
+    - name: Install docker engine on Jenkins master
+      include_tasks: install_docker.yml
+  tags: install_packages
 
-# Create foldersand copy files to the jenkins master
+# Prepare the jenkins master
 - name: Prepare Jenkins master for containers
   include_tasks: prepare_master.yml
 
-# Create foldersand copy files to the jenkins master
-- name: Create and run Jenkins master in container
-  include_tasks: jenkins_dockerized.yml
+# Create and run Jenkins in container
+- block:
+    - name: Create and run Jenkins master in container
+      include_tasks: jenkins_dockerized.yml
+  tags: dockerized   
 
 - name: Perform action to setup the new Jenkins server
   debug:
@@ -25,17 +31,27 @@
   vars:
     jenkins_url: "http://{{ inventory_hostname }}:8080"
 
-# Check for .ssh and ssh keys 
-- name: Check and create if not exist .ssh and keys
-  include_tasks: conf_ssh.yml
+# Check for .ssh and ssh keys
+- block:
+    - name: Check and create if not exist .ssh and keys
+      include_tasks: conf_ssh.yml
+  tags: user_ssh 
+
+# Copy Jenkins config files to ansible host 
+- block:
+    - name: Check and create if not exist .ssh and keys
+      include_tasks: backup_config.yml
+  tags: backup 
 
 #- name: Start docker-compose
 #  docker_compose:
 #  project_src: "{{remote_dir}}/jenkins_master_docker.yml"
 #  state: started
 
-# Run tasks from the 'healthcheck' tag
-- include_tasks: healthcheck.yml
+# Run 'healthcheck' to check the Jenkins container status
+- block:
+    - include_tasks: healthcheck.yml
+  tags: healthcheck
 
 - name: Clear gathered facts
   meta: clear_facts

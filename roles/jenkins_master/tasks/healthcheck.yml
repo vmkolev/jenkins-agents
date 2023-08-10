@@ -1,21 +1,31 @@
 ---
-- name: Get the list of services
+- name: Perform a healthcheck of Jenkins server
+  debug:
+    msg: "Perform a healthcheck of Jenkins server"
+
+
+# Get servers facts 
+- name: Get servers facts
   service_facts:
 
-- name: checking service status
+
+- name: Check the Jenkins container status
   shell: docker ps -a | grep {{ docker_container }}
   register: docker_ps_result
   ignore_errors: yes
-  become: false
 
+
+# Check if it is running, otherwise fail
 - name: Define Variable
   set_fact:
       exists: "{{ docker_ps_result.stdout_lines | default([]) }}"
   failed_when:
     - docker_ps_result.stdout_lines is not defined or docker_ps_result.stdout_lines | length == 0
 
+
 - debug:
-    msg: "{{ docker_container }} is up for: {{ docker_ps_result.stdout_lines }}"
+    msg: "{{ docker_container }} is up : {{ docker_ps_result.stdout_lines }}"
+
 
 - name: Clear gathered facts
   meta: clear_facts

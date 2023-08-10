@@ -12,5 +12,5 @@ Both agents are run in separate virtual machines as a docker container also buil
 
 In order to use it needs to setup environment variables:
 - in the inventory.ini file need to setup the IP addresses of the machines and the ansible user
-- check and edit variables files - vars/main.yml in both roles jenkins_master and jenkins_slaves
+- check and edit variables files - vars/main.yml in both roles jenkins_master and jenkins_agents
 - also be aware that maybe need to define all hosts and IP addresses in /etc/hosts

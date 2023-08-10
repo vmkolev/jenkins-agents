@@ -7,7 +7,7 @@ def launcher
 def nodeName = "{{ item }}"
 int nodePort = Integer.parseInt("{{ nodePort }}")
 int node_numExecutors = Integer.parseInt("{{ node_numExecutors }}")
-def nodeRemoteFS = "{{ nodeRemoteFS }}"
+def nodeRemoteFS = "{{ jenkins_agent_dir }}/{{ item }}"
 def node_mode = "{{ node_mode }}"
 
 ComputerLauncher nodeLauncher = new hudson.slaves.JNLPLauncher()

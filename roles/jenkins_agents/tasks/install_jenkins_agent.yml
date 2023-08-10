@@ -1,9 +1,9 @@
 ---
-- name: Setup prerequisites settings for Slave role
+- name: Setup prerequisites settings for agent
   debug:
-    msg: "Setup prerequisites settings for Slave role!"  
+    msg: "Setup prerequisites settings for agent role!"  
 
-# Create working folder for slave
+# Create working folder for agent
 - name: Create Jenkins Agent Directory - {{ jenkins_agent_directory }}
   file:
     path: "{{ jenkins_agent_directory }}"
@@ -27,7 +27,7 @@
     group: "{{ jenkins_user }}"
   when: not ssh_dir.stat.exists
 
-# Copy public key from master to slave
+# Copy public key from master to agent
 - name: Add SSH public key to authorized_keys on "{{ inventory_hostname }}"
   ansible.builtin.copy:
     content: "{{ lookup('file', playbook_dir + '/roles/jenkins_master/files/ssh/id_rsa_jenkins.pub') }}"

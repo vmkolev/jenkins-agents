@@ -1,9 +1,4 @@
 ---
-- name: Check if Jenkins user exists
-  shell: getent passwd {{ jenkins_user }}
-  ignore_errors: yes
-  register: jenkins_user_check
-
 - name: Add group "jenkins" to remote node
   group:
     name: "{{ jenkins_user }}"
@@ -11,6 +6,7 @@
     state: present
     
 - name: Create Jenkins User and add it to groups
+  become: yes
   user:
     name: "{{ jenkins_user }}"
     uid: 1000
@@ -18,6 +14,3 @@
     home: "{{ jenkins_home_dir }}"
     createhome: true
     shell: "/bin/bash"
-  when: jenkins_user_check.rc != 0
-
-

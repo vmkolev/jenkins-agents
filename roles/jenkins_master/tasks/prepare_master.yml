@@ -30,7 +30,7 @@
     owner: "{{ jenkins_user }}"
     group: "{{ jenkins_user }}"
 
-- name: Copy plugins file to to Jenkins master
+- name: Copy plugins file to Jenkins master
   copy:
     src: "{{plugin_file}}"
     dest: "{{remote_dir}}/build/{{plugin_file}}"
@@ -46,11 +46,16 @@
   run_once: true
   loop: "{{ node_names }}"
 
-- name: Copy scripts folder to to Jenkins master
+- name: Copy scripts folder to Jenkins master
   copy:
     src: scripts/
     dest: "{{remote_dir}}/build/scripts"
     owner: "{{ jenkins_user }}"
     group: "{{ jenkins_user }}"
 
-
+- name: Copy jobs folder to Jenkins master
+  copy:
+    src: files/jobs/
+    dest: "{{jenkins_data}}/jobs"
+    owner: "{{ jenkins_user }}"
+    group: "{{ jenkins_user }}"

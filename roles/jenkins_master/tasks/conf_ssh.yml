@@ -23,7 +23,7 @@
 # Create SSH keypair
 - name: Generate SSH keypair for the {{ jenkins_user }}
   openssh_keypair:
-    path: "{{ jenkins_slave_user_ssh_key }}"
+    path: "{{ jenkins_agent_user_ssh_key }}"
     owner: "{{ jenkins_user }}"
     group: "{{ jenkins_user }}"
     size: 2048

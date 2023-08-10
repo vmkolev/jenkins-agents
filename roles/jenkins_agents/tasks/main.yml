@@ -1,0 +1,69 @@
+---
+# Update chache on Debian like dostro
+- block:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+      when: ansible_facts['os_family'] == "Debian"
+  tags: install_packages
+
+# Update chache on RHEL like dostro
+- block:
+    - name: Update yum cache
+      yum:
+        name: '*'
+        state: latest
+      when: ansible_facts['os_family'] == "RedHat"
+  tags: install_packages
+
+# install NTP client to sync date and time
+- block:
+    - name: Install NTP
+      package:
+        name: "{{ 'ntp' if ansible_os_family == 'Debian' else 'ntpdate' }}"
+        state: present
+  tags: install_packages
+
+# Install all packages listed in vars/main.yml
+- block:
+    - name: Install necessary packages
+      package:
+        name: "{{ packages_to_install[ansible_os_family] }}"
+        state: present
+      when: ansible_os_family == 'Debian' or ansible_os_family == 'RedHat'
+  tags: install_packages
+
+# Install Java on agents ???
+- block:
+    - name: Install Java
+      package:
+        name: "{{ java_debian if ansible_os_family == 'Debian' else java_rhel }}"
+        state: present
+  tags: install_java
+
+# Create jenkins's user uid 1000 for better mapping ?!?!?!
+- block:
+    - include_tasks: jenkins_user.yml
+  tags: user_ssh 
+
+- name: Install docker engine on Jenkins agent
+  include_tasks: install_docker.yml
+
+# Prepare setting for agents - also ssh keys if laucher is set to ssh
+- name: Install Jenkins agent
+  include_tasks: install_jenkins_agent.yml
+
+# Create docker agent image and run it 
+- block:
+    - include_tasks: dockerized.yml
+      vars:
+        jenkins_url: "{{ jenkins_master_url }}"
+  tags: dockerized 
+
+# Check if the agent container is running
+- block:
+    - include_tasks: healthcheck.yml
+  tags: healthcheck
+
+- name: Clear gathered facts
+  meta: clear_facts
