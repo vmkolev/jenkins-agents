@@ -4,7 +4,7 @@
 
 - name: Wait for Jenkins to start
   uri:
-    url: "{{ jenkins_url }}"  # Адресът на Jenkins (променете го според вашите настройки)
+    url: "{{ jenkins_url }}"  # URL of Jenkins
     status_code: 200
     timeout: 60
   register: jenkins_response
